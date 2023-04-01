@@ -1,10 +1,15 @@
 import 'dart:ffi';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:google_fonts/google_fonts.dart';
 
 void main() {
   runApp(const MyApp());
 }
+
+const outPadding = 32.0;
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -14,84 +19,132 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue, brightness: Brightness.dark),
+        textTheme: GoogleFonts.notoSansNKoTextTheme(
+          Theme.of(context).textTheme,
+        ),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Simple To do App'),
+      home: ListViewPage()
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
+class ListViewPage extends StatefulWidget {
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  ListViewPageState createState() => ListViewPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  bool? _isCheck = false;
-  List<Widget> litems = [const Text('Click button and make Todos.')];
+class ListViewPageState extends State<ListViewPage> {
+  final List<String> _items = <String>[];
+  final _url = Uri.parse('https://xn--299a1v27nvthhjj.com/api/2023-03-31');
+  int _selected = 0;
 
-  void _createTodo() {
-    setState(() {
-      litems.add(Container(
-        height: 50,
-        color: Colors.lightBlueAccent,
-        padding: const EdgeInsets.all(8.0),
-        child:
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          Container(
-            alignment: Alignment.centerLeft,
-            child: const Text('Test'),
-          ),
-          Container(
-              alignment: Alignment.centerRight,
-              child: Checkbox(
-                value: _isCheck,
-                onChanged: (value) => {
-                  setState(() {
-                    _isCheck = value!;
-                  })
-                },
-              ))
-        ]),
-      ));
-    });
+  Map<String, dynamic> json = {};
+
+  @override
+  void initState(){
+    super.initState();
+    callApi();
   }
 
-  Widget buildBody(BuildContext ctxt, int index) {
-    return litems[index];
+  void callApi() async {
+    final response = await http.get(_url);
+    json = jsonDecode(response.body);
+    setState(() {
+      List<String> meals = ['breakfast', 'lunch', 'dinner'];
+      meals.forEach((meal) {
+        _items.add(meal);
+        json['meal'][meal].split('/').forEach((menu) {
+          _items.add(menu);
+        });
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      body: Column(
-        children: [
-          Container(
-            height: 700,
-            width: screenWidth,
-            child: ListView.builder(
-                itemBuilder: (BuildContext ctxt, int index) =>
-                    buildBody(ctxt, index),
-                itemCount: litems.length),
+    return Stack(
+      children: [
+        Container(color: Theme.of(context).colorScheme.primary),
+        Container(
+          decoration: const BoxDecoration(
+              gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.white10,
+              Colors.white10,
+              Colors.black12,
+              Colors.black12,
+              Colors.black12,
+              Colors.black12,
+            ],
+          )),
+        ),
+        Scaffold(
+          backgroundColor: Colors.transparent,
+          bottomNavigationBar: BottomNavigationBar(
+            currentIndex: _selected,
+            elevation: 0,
+            onTap: (selected) {
+              setState(() {
+                _selected = selected;
+              });
+            },
+            selectedItemColor: Theme.of(context).colorScheme.onPrimary,
+            unselectedItemColor: Theme.of(context).colorScheme.onPrimaryContainer,
+            items: const [
+              BottomNavigationBarItem(
+                icon: Icon(Icons.home_outlined),
+                label: "",
+                backgroundColor: Colors.transparent),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.newspaper_outlined),
+                label: "",
+                backgroundColor: Colors.transparent),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.person_outline),
+                label: "",
+                backgroundColor: Colors.transparent),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.notifications_outlined),
+                label: "",
+                backgroundColor: Colors.transparent),
+            ],
           ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _createTodo,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
+          body: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(outPadding),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ListView.builder(
+                    itemCount: _items.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      if (['breakfast', 'lunch', 'dinner'].contains(_items[index])) {
+                        return Container(
+                          height: 50,
+                          child: Text(_items[index]),
+                          margin: const EdgeInsets.all(8.0),
+                        );
+                      } else {
+                        return Container(
+                          height: 50,
+                          color: Colors.lightBlueAccent,
+                          padding: const EdgeInsets.all(8.0),
+                          margin: const EdgeInsets.all(8.0),
+                          child: Text(_items[index]),
+                        );
+                      }
+                    },
+                  ),
+                ],
+              )
+            )
+          )
+        )
+      ]
     );
   }
 }
