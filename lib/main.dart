@@ -38,7 +38,6 @@ class ListViewPage extends StatefulWidget {
 class ListViewPageState extends State<ListViewPage> {
   final List<String> _items = <String>[];
   final _url = Uri.parse('https://xn--299a1v27nvthhjj.com/api/2023-03-31');
-  int _selected = 0;
 
   Map<String, dynamic> json = {};
 
@@ -67,52 +66,8 @@ class ListViewPageState extends State<ListViewPage> {
     return Stack(
       children: [
         Container(color: Theme.of(context).colorScheme.primary),
-        Container(
-          decoration: const BoxDecoration(
-              gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Colors.white10,
-              Colors.white10,
-              Colors.black12,
-              Colors.black12,
-              Colors.black12,
-              Colors.black12,
-            ],
-          )),
-        ),
         Scaffold(
           backgroundColor: Colors.transparent,
-          bottomNavigationBar: BottomNavigationBar(
-            currentIndex: _selected,
-            elevation: 0,
-            onTap: (selected) {
-              setState(() {
-                _selected = selected;
-              });
-            },
-            selectedItemColor: Theme.of(context).colorScheme.onPrimary,
-            unselectedItemColor: Theme.of(context).colorScheme.onPrimaryContainer,
-            items: const [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.home_outlined),
-                label: "",
-                backgroundColor: Colors.transparent),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.newspaper_outlined),
-                label: "",
-                backgroundColor: Colors.transparent),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.person_outline),
-                label: "",
-                backgroundColor: Colors.transparent),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.notifications_outlined),
-                label: "",
-                backgroundColor: Colors.transparent),
-            ],
-          ),
           body: SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(outPadding),
@@ -120,6 +75,7 @@ class ListViewPageState extends State<ListViewPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   ListView.builder(
+                    shrinkWrap: true,
                     itemCount: _items.length,
                     itemBuilder: (BuildContext context, int index) {
                       if (['breakfast', 'lunch', 'dinner'].contains(_items[index])) {
