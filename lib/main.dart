@@ -38,9 +38,9 @@ class ListViewPage extends StatefulWidget {
 }
 
 class ListViewPageState extends State<ListViewPage> {
-  final List<String> _items = <String>[];
+  List<String> _items = <String>[];
   var _url = Uri.parse('');
-  final _itemsLength = <int>[];
+  var _itemsLength = <int>[];
 
   Map<String, dynamic> json = {};
 
@@ -53,7 +53,10 @@ class ListViewPageState extends State<ListViewPage> {
   void callApi() async {
     DateTime now = DateTime.now();
     DateFormat formatter = DateFormat('yyyy-MM-dd');
+    _itemsLength = <int>[];
+    _items = <String>[];
     _url = Uri.parse('https://xn--299a1v27nvthhjj.com/api/' + formatter.format(now));
+    print(_url);
     final response = await http.get(_url);
     json = jsonDecode(response.body);
     int i = 0;
@@ -91,6 +94,8 @@ class ListViewPageState extends State<ListViewPage> {
                         shrinkWrap: true,
                         itemCount: _items.length,
                         itemBuilder: (BuildContext context, int index) {
+                          print('length: ${length}');
+                          print('meal: ${meal}');
                           if (['breakfast', 'lunch', 'dinner'].contains(_items[index])) {
                             Map<String, String> mealName = {
                               'breakfast': '아침',
@@ -117,7 +122,7 @@ class ListViewPageState extends State<ListViewPage> {
                                 topRight: Radius.circular(20.0),
                                 topLeft: Radius.circular(20.0)
                               );
-                            } else if (length == _itemsLength[meal-1]) {
+                            } else if (length == _itemsLength[(meal-1)%3]) {
                               borderRadiusOption = const BorderRadius.only(
                                 bottomLeft: Radius.circular(20.0),
                                 bottomRight: Radius.circular(20.0)
