@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'DimiBob',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue, brightness: Brightness.dark),
         textTheme: GoogleFonts.notoSansNKoTextTheme(
@@ -131,11 +131,11 @@ class ListViewPageState extends State<ListViewPage> {
                             return Container(
                               height: 50,
                               padding: const EdgeInsets.all(8.0),
-                              child: Text(_items[index]),
                               decoration: BoxDecoration(
                                 borderRadius: borderRadiusOption,
                                 color: const Color.fromRGBO(249, 249, 250, 1),
                               ),
+                              child: Text(_items[index]),
                             );
                           }
                         },
